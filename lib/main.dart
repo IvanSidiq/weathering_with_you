@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'app/myapp.dart';
@@ -24,6 +25,9 @@ void main() async {
   };
 
   FlutterNativeSplash.remove();
+
+  await dotenv.load();
+
   runZonedGuarded(
     () => runApp(const MyApp()),
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
