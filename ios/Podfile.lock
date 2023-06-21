@@ -1,0 +1,75 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_native_splash (0.0.1):
+    - Flutter
+  - fluttertoast (0.0.2):
+    - Flutter
+    - Toast
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
+  - package_info_plus (0.4.5):
+    - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - Sentry/HybridSDK (8.8.0):
+    - SentryPrivate (= 8.8.0)
+  - sentry_flutter (0.0.1):
+    - Flutter
+    - FlutterMacOS
+    - Sentry/HybridSDK (= 8.8.0)
+  - SentryPrivate (8.8.0)
+  - sqflite (0.0.3):
+    - Flutter
+    - FMDB (>= 2.7.5)
+  - Toast (4.0.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
+  - sqflite (from `.symlinks/plugins/sqflite/ios`)
+
+SPEC REPOS:
+  trunk:
+    - FMDB
+    - Sentry
+    - SentryPrivate
+    - Toast
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_native_splash:
+    :path: ".symlinks/plugins/flutter_native_splash/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  sentry_flutter:
+    :path: ".symlinks/plugins/sentry_flutter/ios"
+  sqflite:
+    :path: ".symlinks/plugins/sqflite/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
+  fluttertoast: fafc4fa4d01a6a9e4f772ecd190ffa525e9e2d9c
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
+  path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
+  Sentry: 927dfb29d18a14d924229a59cc2ad149f43349f2
+  sentry_flutter: cf7da03b65520b631330ecb498deb592aa7640be
+  SentryPrivate: 4350d865f898224ab9fa02b37d6ee7fbb623f47e
+  sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
+
+PODFILE CHECKSUM: 0c71e9bb0efe77bb64976dd32bdc71ccd07b9f1c
+
+COCOAPODS: 1.12.1
