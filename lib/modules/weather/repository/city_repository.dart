@@ -1,21 +1,20 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:weathering_with_you/modules/weather/models/weather.dart';
+import 'package:weathering_with_you/modules/weather/models/city.dart';
 import 'package:weathering_with_you/utils/api.dart';
 
 import '../../../config/base_repository.dart';
 import '../../../models/base_response.dart';
 
-class WeatherRepository extends BaseRepository {
-  Future<BaseResponse> getCurrentWeather(double lat, double lon) async {
-    final response = await fetch(kApiWeather, queryParameters: {
-      'lat': lat,
-      'lon': lon,
+class CityRepository extends BaseRepository {
+  Future<BaseResponse> getCityByName(String cityName) async {
+    final response = await fetch(kApiFindCity, queryParameters: {
+      'q': cityName,
       'appid': dotenv.env['OPEN_WEATHER_API'],
-      'units': 'metric'
     });
 
     if (response.statusCode == 200) {
-      final WeatherData data = WeatherData.fromJson(response.data);
+      final List<City> data =
+          List.from(response.data).map((e) => City.fromJson(e)).toList();
       return BaseResponse(
         statusCode: response.statusCode,
         data: data,

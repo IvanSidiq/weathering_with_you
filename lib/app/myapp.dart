@@ -13,7 +13,8 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   final ColorScheme _lightScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF2155CF), brightness: Brightness.light);
+      seedColor: const Color.fromARGB(255, 117, 152, 204),
+      brightness: Brightness.light);
   final ColorScheme _darkScheme = ColorScheme.fromSeed(
       seedColor: const Color(0xFFB4C5FF), brightness: Brightness.dark);
 
