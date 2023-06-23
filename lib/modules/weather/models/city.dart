@@ -1,17 +1,21 @@
 class City {
   String name = '';
-  double? lat;
-  double? lon;
+  double lat = 0;
+  double lon = 0;
   String country = '';
   String state = '';
 
   City(
-      {this.name = '', this.lat, this.lon, this.country = '', this.state = ''});
+      {this.name = '',
+      this.lat = 0,
+      this.lon = 0,
+      this.country = '',
+      this.state = ''});
 
   City.fromJson(Map<String, dynamic> json) {
     name = json['name'] ?? '';
-    lat = json['lat'];
-    lon = json['lon'];
+    lat = json['lat'] ?? 0;
+    lon = json['lon'] ?? 0;
     country = json['country'] ?? '';
     state = json['state'] ?? '';
   }

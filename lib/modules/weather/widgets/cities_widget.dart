@@ -56,7 +56,7 @@ class _CitiesWidget extends HookWidget {
                 .make();
           }
           return VStack([
-            'Found ${state.cityData.length} cities by name $searchText'
+            'Found ${state.cityData.length} city(s) by name $searchText'
                 .text
                 .textStyle(CustomTextStyle.labelMedium)
                 .make(),

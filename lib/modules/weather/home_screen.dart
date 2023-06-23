@@ -41,35 +41,53 @@ class _HomeScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<WeatherCubit>();
-    String cityName = '';
-    String date = DateFormat('EEEE, dd MMM yyyy').format(DateTime.now());
-    String time = DateFormat('hh:mm').format(DateTime.now());
 
     useEffect(() {
+      // cubit.getCurrentWeather(51.5073219, -0.1276474);
       cubit.getCurrentWeather(-7.5692489, 110.828448);
       return;
     }, [cubit]);
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: CustomColor.surface,
+        backgroundColor: CustomColor.onSurface,
         body: ZStack(
           [
-            CachedNetworkImage(
-              width: context.screenWidth,
-              height: context.screenHeight,
-              imageUrl: ImageLinks.rainy1,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(),
-              errorWidget: (context, url, error) => Container(),
-              imageBuilder: (context, imgProvider) {
-                return VxBox()
-                    .color(CustomColor.error)
-                    .height(context.screenHeight)
-                    .width(context.screenWidth)
-                    .bgImage(
-                        DecorationImage(image: imgProvider, fit: BoxFit.cover))
-                    .make();
+            BlocConsumer<WeatherCubit, WeatherState>(
+              listener: (context, state) {
+                if (state is GetWeatherSuccess) {
+                  final cityDate = (DateTime.fromMillisecondsSinceEpoch(
+                      state.weatherData.dt! * 1000));
+                  cubit.cityName = state.weatherData.name!;
+                  cubit.weatherCode = state.weatherData.weather!.first.id!;
+                  cubit.date = DateFormat('EEEE, dd MMM yyyy').format(cityDate);
+                  cubit.time = DateFormat('HH:mm').format(cityDate);
+                  if (state.weatherData.sys!.sunset! > state.weatherData.dt!) {
+                    cubit.isNight = false;
+                  } else {
+                    cubit.isNight = true;
+                  }
+                }
+              },
+              builder: (context, state) {
+                return CachedNetworkImage(
+                  width: context.screenWidth,
+                  height: context.screenHeight,
+                  imageUrl: linkById(
+                      weatherCode: cubit.weatherCode, night: cubit.isNight),
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(),
+                  errorWidget: (context, url, error) => Container(),
+                  imageBuilder: (context, imgProvider) {
+                    return VxBox()
+                        .color(CustomColor.error)
+                        .height(context.screenHeight)
+                        .width(context.screenWidth)
+                        .bgImage(DecorationImage(
+                            image: imgProvider, fit: BoxFit.cover))
+                        .make();
+                  },
+                );
               },
             ),
             VStack(
@@ -80,23 +98,23 @@ class _HomeScreen extends HookWidget {
                       return const CircularProgressIndicator();
                     }
                     if (state is GetWeatherSuccess) {
-                      final cityDate = (DateTime.fromMillisecondsSinceEpoch(
-                          state.weatherData.dt! * 1000));
-                      cityName = state.weatherData.name!;
-                      date = DateFormat('EEEE, dd MMM yyyy').format(cityDate);
-                      time = DateFormat('hh:mm').format(cityDate);
                       return VStack(
                         [
                           TextField(
+                            style: TextStyle(
+                              color: (cubit.isNight
+                                      ? CustomColor.surface
+                                      : CustomColor.onSurface)
+                                  .withOpacity(0.64),
+                            ),
                             decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: CustomColor.onSurface
-                                          .withOpacity(0.12)),
+                                border: InputBorder.none,
+                                labelStyle: TextStyle(
+                                  color: (cubit.isNight
+                                          ? CustomColor.surface
+                                          : CustomColor.onSurface)
+                                      .withOpacity(0.64),
                                 ),
-                                hintStyle: TextStyle(
-                                    color: CustomColor.onSurfaceVariant),
                                 labelText: 'Search city',
                                 contentPadding:
                                     const EdgeInsets.symmetric(horizontal: 16)),
@@ -109,12 +127,17 @@ class _HomeScreen extends HookWidget {
                                 if (value != null) {
                                   if (value is City) {
                                     cubit.getCurrentWeather(
-                                        value.lat!, value.lon!);
+                                        value.lat, value.lon);
                                   }
                                 }
                               });
                             },
-                          ).p16(),
+                          )
+                              .p8()
+                              .glassMorphic(
+                                  border: Border.all(
+                                      width: 0, style: BorderStyle.none))
+                              .p16(),
                           VStack(
                             [
                               HStack(
@@ -123,13 +146,17 @@ class _HomeScreen extends HookWidget {
                                       .text
                                       .textStyle(CustomTextStyle.displayLarge)
                                       .align(TextAlign.center)
-                                      .color(CustomColor.surface)
+                                      .color(cubit.isNight
+                                          ? CustomColor.surface
+                                          : CustomColor.onSurface)
                                       .make(),
                                   '°C'
                                       .text
                                       .textStyle(CustomTextStyle.titleMedium)
                                       .align(TextAlign.center)
-                                      .color(CustomColor.surface)
+                                      .color(cubit.isNight
+                                          ? CustomColor.surface
+                                          : CustomColor.onSurface)
                                       .make(),
                                 ],
                                 crossAlignment: CrossAxisAlignment.end,
@@ -142,10 +169,9 @@ class _HomeScreen extends HookWidget {
                                   imageUrl:
                                       '$kApiWeatherIcon${state.weatherData.weather!.first.icon!}@2x.png',
                                   fit: BoxFit.contain,
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(),
+                                  placeholder: (context, url) => 50.widthBox,
                                   errorWidget: (context, url, error) =>
-                                      '$error'.text.make(),
+                                      50.widthBox,
                                   imageBuilder: (context, imgProvider) {
                                     return Image(
                                       image: imgProvider,
@@ -158,7 +184,9 @@ class _HomeScreen extends HookWidget {
                                 state.weatherData.weather!.first.description!
                                     .text
                                     .textStyle(CustomTextStyle.titleMedium)
-                                    .color(CustomColor.surface)
+                                    .color(cubit.isNight
+                                        ? CustomColor.surface
+                                        : CustomColor.onSurface)
                                     .align(TextAlign.start)
                                     .make()
                                     .box
@@ -176,29 +204,60 @@ class _HomeScreen extends HookWidget {
                               Icon(
                                 Icons.location_city,
                                 size: 24,
-                                color: CustomColor.surface,
+                                color: cubit.isNight
+                                    ? CustomColor.surface
+                                    : CustomColor.onSurface,
                                 shadows: [
                                   Shadow(
-                                      color: CustomColor.onSurface,
+                                      color: cubit.isNight
+                                          ? CustomColor.onSurface
+                                          : CustomColor.surface,
                                       blurRadius: 50)
                                 ],
                               ),
                               4.widthBox,
-                              cityName.text
+                              cubit.cityName.text
                                   .textStyle(CustomTextStyle.titleMedium)
-                                  .color(CustomColor.surface)
-                                  .shadow(0, 0, 50, CustomColor.onSurface)
+                                  .color(cubit.isNight
+                                      ? CustomColor.surface
+                                      : CustomColor.onSurface)
+                                  .shadow(
+                                    0,
+                                    0,
+                                    50,
+                                    cubit.isNight
+                                        ? CustomColor.onSurface
+                                        : CustomColor.surface,
+                                  )
                                   .make(),
                             ]),
-                            date.text
+                            cubit.date.text
                                 .textStyle(CustomTextStyle.titleMedium)
-                                .color(CustomColor.surface)
-                                .shadow(0, 0, 50, CustomColor.onSurface)
+                                .color(cubit.isNight
+                                    ? CustomColor.surface
+                                    : CustomColor.onSurface)
+                                .shadow(
+                                  0,
+                                  0,
+                                  50,
+                                  cubit.isNight
+                                      ? CustomColor.onSurface
+                                      : CustomColor.surface,
+                                )
                                 .make(),
-                            time.text
+                            cubit.time.text
                                 .textStyle(CustomTextStyle.titleMedium)
-                                .color(CustomColor.surface)
-                                .shadow(0, 0, 50, CustomColor.onSurface)
+                                .color(cubit.isNight
+                                    ? CustomColor.surface
+                                    : CustomColor.onSurface)
+                                .shadow(
+                                  0,
+                                  0,
+                                  50,
+                                  cubit.isNight
+                                      ? CustomColor.onSurface
+                                      : CustomColor.surface,
+                                )
                                 .make(),
                           ]).px16(),
                         ],

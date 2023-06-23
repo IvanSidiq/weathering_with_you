@@ -8,6 +8,11 @@ part 'weather_state.dart';
 
 class WeatherCubit extends Cubit<WeatherState> {
   WeatherCubit() : super(WeatherInitial());
+  String cityName = '';
+  String date = '';
+  String time = '';
+  bool isNight = false;
+  int weatherCode = 800;
 
   final _repo = WeatherRepository();
 
