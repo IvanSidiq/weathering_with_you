@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:weathering_with_you/modules/weather/cubit/city_cubit.dart';
+import 'package:weathering_with_you/modules/weather/cubit/detail_cubit.dart';
 import 'package:weathering_with_you/modules/weather/cubit/weather_cubit.dart';
 import 'package:weathering_with_you/utils/api.dart';
 import 'package:weathering_with_you/utils/colors.dart';
@@ -14,7 +15,10 @@ import 'package:weathering_with_you/utils/customs/custom_text_style.dart';
 import 'package:weathering_with_you/utils/image_links.dart';
 
 import 'models/city.dart';
+import 'models/weather.dart';
 import 'widgets/cities_widget.dart';
+
+part 'widgets/weather_detail_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,6 +33,9 @@ class HomeScreen extends StatelessWidget {
         BlocProvider(
           create: (context) => CityCubit(),
         ),
+        BlocProvider(
+          create: (context) => DetailCubit(),
+        ),
       ],
       child: const _HomeScreen(),
     );
@@ -41,6 +48,7 @@ class _HomeScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<WeatherCubit>();
+    final sCubit = context.read<DetailCubit>();
 
     useEffect(() {
       cubit.determinePosition();
@@ -97,6 +105,7 @@ class _HomeScreen extends HookWidget {
                       return const CircularProgressIndicator();
                     }
                     if (state is GetWeatherSuccess) {
+                      final weatherData = state.weatherData;
                       return VStack(
                         [
                           HStack([
@@ -151,67 +160,95 @@ class _HomeScreen extends HookWidget {
                                   border: Border.all(
                                       width: 0, style: BorderStyle.none))
                               .p16(),
-                          VStack(
-                            [
-                              HStack(
+                          BlocBuilder<DetailCubit, DetailState>(
+                            builder: (context, state) {
+                              return VStack(
                                 [
-                                  '${state.weatherData.main!.temp.round()}'
-                                      .text
-                                      .textStyle(CustomTextStyle.displayLarge)
-                                      .align(TextAlign.center)
-                                      .color(cubit.isNight
-                                          ? CustomColor.surface
-                                          : CustomColor.onSurface)
+                                  HStack(
+                                    [
+                                      '${weatherData.main!.temp.round()}'
+                                          .text
+                                          .textStyle(
+                                              CustomTextStyle.displayLarge)
+                                          .align(TextAlign.center)
+                                          .color(cubit.isNight
+                                              ? CustomColor.surface
+                                              : CustomColor.onSurface)
+                                          .make(),
+                                      '°C'
+                                          .text
+                                          .textStyle(
+                                              CustomTextStyle.titleMedium)
+                                          .align(TextAlign.center)
+                                          .color(cubit.isNight
+                                              ? CustomColor.surface
+                                              : CustomColor.onSurface)
+                                          .make(),
+                                    ],
+                                    crossAlignment: CrossAxisAlignment.end,
+                                  )
+                                      .px8()
+                                      .box
+                                      .p4
+                                      .color((cubit.isNight
+                                              ? CustomColor.onSurface
+                                              : CustomColor.surface)
+                                          .withOpacity(
+                                              sCubit.isShown ? 0.8 : 0.4))
+                                      .withRounded(value: 8)
                                       .make(),
-                                  '°C'
-                                      .text
-                                      .textStyle(CustomTextStyle.titleMedium)
-                                      .align(TextAlign.center)
-                                      .color(cubit.isNight
-                                          ? CustomColor.surface
-                                          : CustomColor.onSurface)
-                                      .make(),
-                                ],
-                                crossAlignment: CrossAxisAlignment.end,
-                              ).px8().glassMorphic(
-                                  border: Border.all(
-                                      width: 0, style: BorderStyle.none)),
-                              8.heightBox,
-                              HStack([
-                                CachedNetworkImage(
-                                  imageUrl:
-                                      '$kApiWeatherIcon${state.weatherData.weather!.first.icon}@2x.png',
-                                  fit: BoxFit.contain,
-                                  placeholder: (context, url) => 50.widthBox,
-                                  errorWidget: (context, url, error) =>
-                                      50.widthBox,
-                                  imageBuilder: (context, imgProvider) {
-                                    return Image(
-                                      image: imgProvider,
-                                      width: 50,
-                                      height: 50,
+                                  8.heightBox,
+                                  HStack([
+                                    CachedNetworkImage(
+                                      imageUrl:
+                                          '$kApiWeatherIcon${weatherData.weather!.first.icon}@2x.png',
                                       fit: BoxFit.contain,
-                                    );
-                                  },
-                                ),
-                                state
-                                    .weatherData.weather!.first.description.text
-                                    .textStyle(CustomTextStyle.titleMedium)
-                                    .color(cubit.isNight
-                                        ? CustomColor.surface
-                                        : CustomColor.onSurface)
-                                    .align(TextAlign.start)
-                                    .make()
-                                    .box
-                                    .width(80)
-                                    .make(),
-                              ]).glassMorphic(
-                                  border: Border.all(
-                                      width: 0, style: BorderStyle.none)),
-                            ],
-                            crossAlignment: CrossAxisAlignment.center,
-                            alignment: MainAxisAlignment.center,
-                          ).w(context.screenWidth).expand(),
+                                      placeholder: (context, url) =>
+                                          50.widthBox,
+                                      errorWidget: (context, url, error) =>
+                                          50.widthBox,
+                                      imageBuilder: (context, imgProvider) {
+                                        return Image(
+                                          image: imgProvider,
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.contain,
+                                        );
+                                      },
+                                    ),
+                                    weatherData.weather!.first.description.text
+                                        .textStyle(CustomTextStyle.titleMedium)
+                                        .color(cubit.isNight
+                                            ? CustomColor.surface
+                                            : CustomColor.onSurface)
+                                        .align(TextAlign.start)
+                                        .make()
+                                        .box
+                                        .width(80)
+                                        .make(),
+                                  ])
+                                      .box
+                                      .p4
+                                      .color((cubit.isNight
+                                              ? CustomColor.onSurface
+                                              : CustomColor.surface)
+                                          .withOpacity(
+                                              sCubit.isShown ? 0.8 : 0.4))
+                                      .withRounded(value: 8)
+                                      .make(),
+                                  8.heightBox,
+                                  sCubit.isShown
+                                      ? _WeatherDetailWidget(
+                                          weatherData: weatherData)
+                                      : Container(),
+                                ],
+                                crossAlignment: CrossAxisAlignment.center,
+                                alignment: MainAxisAlignment.center,
+                              ).w(context.screenWidth).onTap(() {
+                                sCubit.showDetail();
+                              }).expand();
+                            },
+                          ),
                           VStack([
                             HStack([
                               Icon(
