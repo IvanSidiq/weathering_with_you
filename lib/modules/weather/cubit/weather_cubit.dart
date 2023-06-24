@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 import 'package:weathering_with_you/utils/customs/custom_toast.dart';
 
@@ -16,6 +20,7 @@ class WeatherCubit extends Cubit<WeatherState> {
   bool isNight = false;
   bool isLocationOn = false;
   int weatherCode = 800;
+  final String localStorageKey = 'weathering_ww_key';
 
   final _repo = WeatherRepository();
 
@@ -24,7 +29,21 @@ class WeatherCubit extends Cubit<WeatherState> {
     final response = await _repo.getCurrentWeather(lat, lon);
 
     if (response.statusCode == 200) {
+      GetIt.I<FlutterSecureStorage>()
+          .write(key: localStorageKey, value: json.encode(response.data));
       emit(GetWeatherSuccess(response.data));
+    } else {
+      getWeatherFromLocalStorage();
+    }
+  }
+
+  Future<void> getWeatherFromLocalStorage() async {
+    final fromLocal =
+        await GetIt.I<FlutterSecureStorage>().read(key: localStorageKey);
+    if (fromLocal != null) {
+      Map<String, dynamic> map = json.decode(fromLocal);
+      final lastWeatherData = WeatherData.fromJson(map);
+      emit(GetWeatherSuccess(lastWeatherData));
     } else {
       emit(GetWeatherFailed());
     }

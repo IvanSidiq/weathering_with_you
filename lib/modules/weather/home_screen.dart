@@ -280,9 +280,12 @@ class _HomeScreen extends HookWidget {
                               100)
                           .w(context.screenWidth);
                     }
-                    return 'Please activate location or search a city'
+                    return 'Welcome to Weathering With You App'
                         .text
-                        .makeCentered();
+                        .textStyle(CustomTextStyle.bodyMedium)
+                        .makeCentered()
+                        .w(400)
+                        .centered();
                   },
                 )
               ],
