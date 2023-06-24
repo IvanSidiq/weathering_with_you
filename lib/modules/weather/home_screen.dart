@@ -43,8 +43,7 @@ class _HomeScreen extends HookWidget {
     final cubit = context.read<WeatherCubit>();
 
     useEffect(() {
-      // cubit.getCurrentWeather(51.5073219, -0.1276474);
-      cubit.getCurrentWeather(-7.5692489, 110.828448);
+      cubit.determinePosition();
       return;
     }, [cubit]);
 
@@ -57,12 +56,12 @@ class _HomeScreen extends HookWidget {
               listener: (context, state) {
                 if (state is GetWeatherSuccess) {
                   final cityDate = (DateTime.fromMillisecondsSinceEpoch(
-                      state.weatherData.dt! * 1000));
-                  cubit.cityName = state.weatherData.name!;
-                  cubit.weatherCode = state.weatherData.weather!.first.id!;
+                      state.weatherData.dt * 1000));
+                  cubit.cityName = state.weatherData.name;
+                  cubit.weatherCode = state.weatherData.weather!.first.id;
                   cubit.date = DateFormat('EEEE, dd MMM yyyy').format(cityDate);
                   cubit.time = DateFormat('HH:mm').format(cityDate);
-                  if (state.weatherData.sys!.sunset! > state.weatherData.dt!) {
+                  if (state.weatherData.sys!.sunset > state.weatherData.dt) {
                     cubit.isNight = false;
                   } else {
                     cubit.isNight = true;
@@ -100,40 +99,54 @@ class _HomeScreen extends HookWidget {
                     if (state is GetWeatherSuccess) {
                       return VStack(
                         [
-                          TextField(
-                            style: TextStyle(
+                          HStack([
+                            TextField(
+                              style: TextStyle(
+                                color: (cubit.isNight
+                                        ? CustomColor.surface
+                                        : CustomColor.onSurface)
+                                    .withOpacity(0.64),
+                              ),
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelStyle: TextStyle(
+                                    color: (cubit.isNight
+                                            ? CustomColor.surface
+                                            : CustomColor.onSurface)
+                                        .withOpacity(0.64),
+                                  ),
+                                  labelText: 'Search city',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16)),
+                              onSubmitted: (value) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return CitiesWidget(searchText: value);
+                                    }).then((value) {
+                                  if (value != null) {
+                                    if (value is City) {
+                                      cubit.getCurrentWeather(
+                                          value.lat, value.lon);
+                                    }
+                                  }
+                                });
+                              },
+                            ).p8().expand(),
+                            Icon(
+                              cubit.isLocationOn
+                                  ? Icons.location_on
+                                  : Icons.location_off,
+                              size: 24,
                               color: (cubit.isNight
                                       ? CustomColor.surface
                                       : CustomColor.onSurface)
                                   .withOpacity(0.64),
-                            ),
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                labelStyle: TextStyle(
-                                  color: (cubit.isNight
-                                          ? CustomColor.surface
-                                          : CustomColor.onSurface)
-                                      .withOpacity(0.64),
-                                ),
-                                labelText: 'Search city',
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 16)),
-                            onSubmitted: (value) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CitiesWidget(searchText: value);
-                                  }).then((value) {
-                                if (value != null) {
-                                  if (value is City) {
-                                    cubit.getCurrentWeather(
-                                        value.lat, value.lon);
-                                  }
-                                }
-                              });
-                            },
-                          )
-                              .p8()
+                            ).p8().onTap(() {
+                              cubit.determinePosition();
+                            }),
+                            8.widthBox
+                          ])
                               .glassMorphic(
                                   border: Border.all(
                                       width: 0, style: BorderStyle.none))
@@ -142,7 +155,7 @@ class _HomeScreen extends HookWidget {
                             [
                               HStack(
                                 [
-                                  '${state.weatherData.main!.temp!.round()}'
+                                  '${state.weatherData.main!.temp.round()}'
                                       .text
                                       .textStyle(CustomTextStyle.displayLarge)
                                       .align(TextAlign.center)
@@ -167,7 +180,7 @@ class _HomeScreen extends HookWidget {
                               HStack([
                                 CachedNetworkImage(
                                   imageUrl:
-                                      '$kApiWeatherIcon${state.weatherData.weather!.first.icon!}@2x.png',
+                                      '$kApiWeatherIcon${state.weatherData.weather!.first.icon}@2x.png',
                                   fit: BoxFit.contain,
                                   placeholder: (context, url) => 50.widthBox,
                                   errorWidget: (context, url, error) =>
@@ -181,8 +194,8 @@ class _HomeScreen extends HookWidget {
                                     );
                                   },
                                 ),
-                                state.weatherData.weather!.first.description!
-                                    .text
+                                state
+                                    .weatherData.weather!.first.description.text
                                     .textStyle(CustomTextStyle.titleMedium)
                                     .color(cubit.isNight
                                         ? CustomColor.surface

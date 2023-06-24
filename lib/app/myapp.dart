@@ -15,8 +15,6 @@ class MyAppState extends State<MyApp> {
   final ColorScheme _lightScheme = ColorScheme.fromSeed(
       seedColor: const Color.fromARGB(255, 117, 152, 204),
       brightness: Brightness.light);
-  final ColorScheme _darkScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFFB4C5FF), brightness: Brightness.dark);
 
   @override
   void initState() {
@@ -32,11 +30,6 @@ class MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: _lightScheme,
         scaffoldBackgroundColor: Colors.white,
-        fontFamily: 'Inter',
-      ),
-      darkTheme: ThemeData(
-        colorScheme: _darkScheme,
-        scaffoldBackgroundColor: Colors.black,
         fontFamily: 'Inter',
       ),
     );

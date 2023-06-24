@@ -22,13 +22,6 @@ class MainRepository {
         .currentState!
         .context
         .goNamed('home');
-
-    // LocationPermission permission = await Geolocator.checkPermission();
-    // if (permission == LocationPermission.denied) {
-    //   permission = await Geolocator.requestPermission();
-    // } else {
-    //   await Future.delayed(Duration(milliseconds: 1500));
-    // }
   }
 
   Future<void> setConfig() async {

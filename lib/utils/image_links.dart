@@ -1,8 +1,6 @@
 //Taking them pictures from PEXEL credit by them
 //For now saving them manually here coz it would take long time to randomize image by their API
 
-class ImageLinks {}
-
 String linkById({required weatherCode, required bool night}) {
   String id = '';
   switch (weatherCode) {
